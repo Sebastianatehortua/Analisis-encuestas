@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reporte de PQR - IPS CEAD ALIVIUM</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { background-color: #f8f9fa; padding: 2rem; }
+    .report-section {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.1);
+      margin-bottom: 2rem;
+    }
+    h1 { color: #0d6efd; margin-bottom: 2rem; }
+    .metric { font-size: 1.2rem; margin-bottom: 1rem; }
+    canvas { max-width: 600px; max-height: 300px; margin: 2rem auto; display: block; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="text-center"><i class="bi bi-bar-chart-line"></i> Reporte General de PQR</h1>
+    <div class="report-section">
+      <div id="reporte"></div>
+      <canvas id="graficoTipos"></canvas>
+      <canvas id="graficoEstados"></canvas>
+    </div>
+  </div>
+
+  <script>
+    const pqr = [
+      { tipo: 'Queja', estado: 'Resuelto' },
+      { tipo: 'Petición', estado: 'Abierto' },
+      { tipo: 'Reclamo', estado: 'Resuelto' },
+      { tipo: 'Sugerencia', estado: 'Cerrado' },
+      { tipo: 'Queja', estado: 'En proceso' }
+    ];
+
+    const total = pqr.length;
+    const porTipo = {};
+    const porEstado = {};
+
+    pqr.forEach(item => {
+      porTipo[item.tipo] = (porTipo[item.tipo] || 0) + 1;
+      porEstado[item.estado] = (porEstado[item.estado] || 0) + 1;
+    });
+
+    let html = `<div class='metric'><strong>Total de PQR registradas:</strong> ${total}</div>`;
+    html += '<div class="metric"><strong>Distribución por tipo:</strong><ul>';
+    for (let tipo in porTipo) {
+      html += `<li>${tipo}: ${porTipo[tipo]}</li>`;
+    }
+    html += '</ul></div>';
+
+    html += '<div class="metric"><strong>Distribución por estado:</strong><ul>';
+    for (let estado in porEstado) {
+      html += `<li>${estado}: ${porEstado[estado]}</li>`;
+    }
+    html += '</ul></div>';
+
+    document.getElementById('reporte').innerHTML = html;
+
+    const ctx1 = document.getElementById('graficoTipos').getContext('2d');
+    new Chart(ctx1, {
+      type: 'bar',
+      data: {
+        labels: Object.keys(porTipo),
+        datasets: [{
+          label: 'Tipos de PQR',
+          data: Object.values(porTipo),
+          backgroundColor: 'rgba(0, 123, 255, 0.6)',
+          borderColor: 'rgba(0, 123, 255, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+
+    const ctx2 = document.getElementById('graficoEstados').getContext('2d');
+    new Chart(ctx2, {
+      type: 'pie',
+      data: {
+        labels: Object.keys(porEstado),
+        datasets: [{
+          label: 'Estados',
+          data: Object.values(porEstado),
+          backgroundColor: ['#5bc0de', '#6c757d', '#0d6efd', '#a2c4f5']
+        }]
+      },
+      options: {
+        responsive: true
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reporte de Tickets - IPS CEAD ALIVIUM</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { background-color: #f8f9fa; padding: 2rem; }
+    .report-section {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.1);
+      margin-bottom: 2rem;
+    }
+    h1 { color: #0d6efd; margin-bottom: 2rem; }
+    .metric { font-size: 1.2rem; margin-bottom: 1rem; }
+    canvas { max-width: 600px; max-height: 300px; margin: 2rem auto; display: block; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="text-center"><i class="bi bi-graph-up-arrow"></i> Reporte General de Tickets</h1>
+    <div class="report-section">
+      <div id="reporte"></div>
+      <canvas id="graficoEstados"></canvas>
+      <canvas id="graficoCriticidad"></canvas>
+    </div>
+  </div>
+
+  <script>
+    const tickets = [
+      { estado: 'Cerrado', criticidad: 'Alta', fechaCreacion: '2025-05-18T08:30:00', fechaResolucion: '2025-05-18T14:00:00' },
+      { estado: 'Resuelto', criticidad: 'Media', fechaCreacion: '2025-05-19T09:00:00', fechaResolucion: '2025-05-20T10:00:00' },
+      { estado: 'Abierto', criticidad: 'Alta', fechaCreacion: '2025-05-21T08:00:00' },
+      { estado: 'En proceso', criticidad: 'Media', fechaCreacion: '2025-05-20T13:00:00' }
+    ];
+
+    const total = tickets.length;
+    const porEstado = {};
+    const porCriticidad = {};
+    let tiempoTotalHoras = 0;
+    let resueltos24h = 0;
+    let ticketsConTiempo = 0;
+    let ticketsAbiertos = 0;
+
+    tickets.forEach(t => {
+      porEstado[t.estado] = (porEstado[t.estado] || 0) + 1;
+      porCriticidad[t.criticidad] = (porCriticidad[t.criticidad] || 0) + 1;
+
+      if (t.estado === 'Abierto' || t.estado === 'En proceso') ticketsAbiertos++;
+
+      if (t.fechaResolucion) {
+        const inicio = new Date(t.fechaCreacion);
+        const fin = new Date(t.fechaResolucion);
+        const horas = (fin - inicio) / (1000 * 60 * 60);
+        tiempoTotalHoras += horas;
+        ticketsConTiempo++;
+        if (horas <= 24) resueltos24h++;
+      }
+    });
+
+    const tiempoPromedio = ticketsConTiempo ? (tiempoTotalHoras / ticketsConTiempo).toFixed(2) : 'N/A';
+    const porcentaje24h = ticketsConTiempo ? ((resueltos24h / ticketsConTiempo) * 100).toFixed(1) + '%' : 'N/A';
+
+    let html = `<div class='metric'><strong>Total de tickets registrados:</strong> ${total}</div>`;
+    html += `<div class='metric'><strong>Tickets abiertos actualmente:</strong> ${ticketsAbiertos}</div>`;
+    html += `<div class='metric'><strong>Tiempo promedio de respuesta:</strong> ${tiempoPromedio} horas</div>`;
+    html += `<div class='metric'><strong>Tickets resueltos en menos de 24h:</strong> ${resueltos24h} (${porcentaje24h})</div>`;
+
+    document.getElementById('reporte').innerHTML = html;
+
+    const ctx1 = document.getElementById('graficoEstados').getContext('2d');
+    new Chart(ctx1, {
+      type: 'bar',
+      data: {
+        labels: Object.keys(porEstado),
+        datasets: [{
+          label: 'Tickets por Estado',
+          data: Object.values(porEstado),
+          backgroundColor: 'rgba(0, 123, 255, 0.6)',
+          borderColor: 'rgba(0, 123, 255, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+
+    const ctx2 = document.getElementById('graficoCriticidad').getContext('2d');
+    new Chart(ctx2, {
+      type: 'pie',
+      data: {
+        labels: Object.keys(porCriticidad),
+        datasets: [{
+          label: 'Criticidad',
+          data: Object.values(porCriticidad),
+          backgroundColor: ['#5bc0de', '#6c757d', '#0d6efd']
+        }]
+      },
+      options: {
+        responsive: true
+      }
+    });
+  </script>
+</body>
+</html>
