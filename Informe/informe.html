@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard-Reporte</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js">document.addEventListener('DOMContentLoaded', () => {
+  const tablaVisible = localStorage.getItem('tablaDatosVisible') === 'true';
+  const graficoVisible = localStorage.getItem('graficosPreguntasVisible') === 'true';
+
+  const tablaCont = document.getElementById('tablaDatosWrapper');
+  const graficoCont = document.getElementById('graficosPreguntas');
+  const tablaBtn = document.querySelector('button[onclick="toggleTablaDatos()"]');
+  const graficoBtn = document.querySelector('button[onclick="toggleGraficosPreguntas()"]');
+
+  if (tablaCont && tablaBtn) {
+    tablaCont.style.display = tablaVisible ? 'block' : 'none';
+    tablaBtn.textContent = tablaVisible ? 'Ocultar' : 'Mostrar';
+  }
+  if (graficoCont && graficoBtn) {
+    graficoCont.style.display = graficoVisible ? 'block' : 'none';
+    graficoBtn.textContent = graficoVisible ? 'Ocultar' : 'Mostrar';
+  }
+});
+</script>
+<script>
+  function toggleGraficosPreguntas() {
+  const contenedor = document.getElementById('graficosPreguntas');
+  const boton = document.querySelector('button[onclick="toggleGraficosPreguntas()"]');
+  const visible = contenedor.style.display !== 'none';
+  contenedor.style.display = visible ? 'none' : 'block';
+  boton.textContent = visible ? 'Mostrar' : 'Ocultar';
+  localStorage.setItem('graficosPreguntasVisible', !visible);
+}
+</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      background-color: #f4f6f9;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .cead-header {
+      background-color: #2e4c8c;
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    .cead-header img {
+      height: 50px;
+    }
+    main {
+      padding: 2rem;
+    }
+    .btn-primary {
+      background-color: #54c4ec;
+      border-color: #54c4ec;
+    }
+    .btn-primary:hover {
+      background-color: #46add1;
+      border-color: #46add1;
+    }
+    label {
+      font-weight: 600;
+    }
+    .card-section {
+      background: white;
+      border-radius: 8px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      margin-bottom: 2rem;
+    }
+    canvas {
+      background-color: white;
+      border-radius: 8px;
+      padding: 1rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+  </style>
+</head>
+<body class="p-0">
+  <header class="cead-header">
+    <img src="/img/0A-CEAD.png" alt="CEAD Logo" />
+    <h1 class="h5 mb-0">Dashboard-Reportes</h1>
+  </header>
+  <main>
+    <div class="card-section">
+      <div class="mb-3">
+        <label for="fileInput" class="form-label">Subir archivo CSV o XLSX</label>
+        <input type="file" id="fileInput" class="form-control" accept=".csv,.xlsx" />
+      </div>
+      <div class="row">
+        <div class="col-md-3">
+          <label for="fechaInicio" class="form-label">Fecha Desde</label>
+          <input type="date" id="fechaInicio" class="form-control" />
+        </div>
+        <div class="col-md-3">
+          <label for="fechaFin" class="form-label">Fecha Hasta</label>
+          <input type="date" id="fechaFin" class="form-control" />
+        </div>
+        <div class="col-md-3">
+          <label for="agenteFiltro" class="form-label">Filtrar por Agente</label>
+          <select id="agenteFiltro" class="form-select">
+            <option value="">Todos</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label for="servicioFiltro" class="form-label">Filtrar por Servicio</label>
+          <select id="servicioFiltro" class="form-select">
+            <option value="">Todos</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-check form-switch mt-3">
+        <input class="form-check-input" type="checkbox" id="modoOscuro" onchange="toggleDarkMode()">
+        <label class="form-check-label" for="modoOscuro">Modo Oscuro</label>
+      </div>
+      <div class="mt-3 d-flex justify-content-between align-items-center">
+        <div id="filtrosActivos" class="text-muted"></div>
+        <div>
+          <button class="btn btn-primary" onclick="aplicarFiltros()">Aplicar Filtros</button>
+          <button class="btn btn-outline-success ms-2" onclick="exportarTabla()">Exportar Tabla</button>
+        </div>
+      </div>
+      <div id="loader" style="display:none;" class="text-center my-3">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p class="mt-2">Procesando archivo...</p>
+      </div>
+    </div>
+    <div class="card-section">
+      <p id="totalServicios" class="fs-5 fw-bold mb-0 text-primary"></p>
+    </div>
+    <div class="card-section">
+      <canvas id="graficoResumen" height="100" class="mb-5"></canvas>
+      <canvas id="graficoServicios" height="100"></canvas>
+    </div>
+    <div class="card-section">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0">Gráficos de Preguntas de Satisfacción</h5>
+        <button class="btn btn-sm btn-outline-primary" type="button" onclick="toggleGraficosPreguntas()">Mostrar</button>
+      </div>
+      <div id="graficosPreguntas" style="display: none;"></div>
+    </div>
+    <div class="card-section">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0">Detalle de Registros</h5>
+        <button class="btn btn-sm btn-outline-primary" type="button" onclick="toggleTablaDatos()">Mostrar</button>
+      </div>
+      <div class="table-responsive" id="tablaDatosWrapper" style="display: none;">
+        <table class="table table-bordered table-hover" id="tablaDatos">
+          <thead class="table-light"></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+  <script>
+    let datosOriginales = [], chart, chartServicios;
+
+    function toggleDarkMode() {
+      document.body.classList.toggle('bg-dark');
+      document.body.classList.toggle('text-white');
+      document.querySelectorAll('.card-section').forEach(c => c.classList.toggle('bg-secondary'));
+    }
+
+    document.getElementById('fileInput').addEventListener('change', function (e) {
+      document.getElementById('loader').style.display = 'block';
+      const file = e.target.files[0];
+      if (!file) return;
+      const fileExt = file.name.split('.').pop().toLowerCase();
+
+      if (fileExt === 'csv') {
+        Papa.parse(file, {
+          header: true,
+          skipEmptyLines: true,
+          complete: function (results) {
+            datosOriginales = results.data.map(limpiarCampos);
+            llenarFiltros(datosOriginales);
+            aplicarFiltros();
+            document.getElementById('loader').style.display = 'none';
+          },
+          transformHeader: header => header.trim()
+        });
+      } else if (fileExt === 'xlsx') {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const firstSheet = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[firstSheet];
+          datosOriginales = XLSX.utils.sheet_to_json(worksheet, { raw: false }).map(limpiarCampos);
+          llenarFiltros(datosOriginales);
+          aplicarFiltros();
+          document.getElementById('loader').style.display = 'none';
+        };
+        reader.readAsArrayBuffer(file);
+      } else {
+        alert('Formato no compatible. Solo se aceptan CSV o XLSX.');
+        document.getElementById('loader').style.display = 'none';
+      }
+    });
+
+    function exportarTabla() {
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.json_to_sheet(datosOriginales);
+      XLSX.utils.book_append_sheet(wb, ws, "Datos Filtrados");
+      XLSX.writeFile(wb, "datos_filtrados.xlsx");
+    }
+
+    function limpiarCampos(row) {
+      const nueva = {};
+      for (let key in row) {
+        const limpio = key.replace(/\s+/g, ' ').trim();
+        nueva[limpio] = typeof row[key] === 'string' ? row[key].trim() : row[key];
+      }
+      if (!isNaN(nueva['Fecha']) && !isNaN(parseFloat(nueva['Fecha']))) {
+        const excelDate = parseFloat(nueva['Fecha']);
+        const jsDate = new Date((excelDate - 25569) * 86400 * 1000);
+        nueva['Fecha'] = jsDate.toISOString().split('T')[0];
+      } else if (typeof nueva['Fecha'] === 'string') {
+        let f = new Date(nueva['Fecha']);
+        if (!isNaN(f)) {
+          nueva['Fecha'] = f.toISOString().split('T')[0];
+        }
+      }
+      return nueva;
+    }
+
+    function llenarFiltros(data) {
+      const agentes = new Set();
+      const servicios = new Set();
+      data.forEach(row => {
+        if (row['Nombre']) agentes.add(row['Nombre']);
+        if (row['Servicio a calificar']) servicios.add(row['Servicio a calificar']);
+      });
+      document.getElementById('agenteFiltro').innerHTML = '<option value="">Todos</option>' +
+        Array.from(agentes).map(a => `<option value="${a}">${a}</option>`).join('');
+      document.getElementById('servicioFiltro').innerHTML = '<option value="">Todos</option>' +
+        Array.from(servicios).map(s => `<option value="${s}">${s}</option>`).join('');
+    }
+
+    function aplicarFiltros() {
+      console.log("[Filtro] Aplicando filtros...");
+      const fechaInicio = document.getElementById('fechaInicio').value;
+      const fechaFin = document.getElementById('fechaFin').value;
+      const agente = document.getElementById('agenteFiltro').value;
+      const servicio = document.getElementById('servicioFiltro').value;
+
+      const filtrados = datosOriginales.filter(row => {
+        const cumpleFecha = (!fechaInicio || row['Fecha'] >= fechaInicio) && (!fechaFin || row['Fecha'] <= fechaFin);
+        const cumpleAgente = !agente || row['Nombre'] === agente;
+        const cumpleServicio = !servicio || row['Servicio a calificar'] === servicio;
+        return cumpleFecha && cumpleAgente && cumpleServicio;
+      });
+
+      console.log(`[Filtro] Filtrados: ${filtrados.length} registros`);
+      if (filtrados.length === 0) {
+        alert("No se encontraron registros con los filtros aplicados.");
+      }
+
+      try {
+        renderizarTabla(filtrados);
+        renderizarGrafico(filtrados);
+        renderizarGraficoServicios(filtrados);
+        renderizarGraficosPreguntas(filtrados);
+        mostrarTotalServicios(filtrados);
+      } catch (error) {
+        console.error("Error al renderizar gráficos:", error);
+      }
+
+      document.getElementById('filtrosActivos').innerText =
+        `Filtros: ${fechaInicio || 'inicio'} → ${fechaFin || 'fin'}, Agente: ${agente || 'Todos'}, Servicio: ${servicio || 'Todos'}`;
+    }
+
+    function mostrarTotalServicios(data) {
+      document.getElementById('totalServicios').innerText = `Total de registros: ${data.length}`;
+    }
+
+    function renderizarTabla(data) {
+      const tabla = document.getElementById('tablaDatos');
+      const thead = tabla.querySelector('thead');
+      const tbody = tabla.querySelector('tbody');
+      if (data.length === 0) {
+        thead.innerHTML = '<tr><th>No hay datos</th></tr>';
+        tbody.innerHTML = '';
+        return;
+      }
+      const columnas = Object.keys(data[0]);
+      thead.innerHTML = '<tr>' + columnas.map(col => `<th>${col}</th>`).join('') + '</tr>';
+      tbody.innerHTML = data.map(row => {
+        return '<tr>' + columnas.map(col => `<td>${row[col] || ''}</td>`).join('') + '</tr>';
+      }).join('');
+    }
+
+    function renderizarGrafico(data) {
+      const resumen = {};
+      data.forEach(row => {
+        const agente = row['Nombre'] || 'Desconocido';
+        resumen[agente] = (resumen[agente] || 0) + 1;
+      });
+      const labels = Object.keys(resumen);
+      const valores = Object.values(resumen);
+      const paleta = ['#45B1DF', '#63AEE0', '#2E4C8C', '#A5C6E5', '#CFE5F5'];
+      const colores = labels.map((_, i) => paleta[i % paleta.length]);
+      const ctx = document.getElementById('graficoResumen').getContext('2d');
+      if (window.chart) window.chart.destroy();
+      window.chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Número de Encuestas por Agente',
+            data: valores,
+            backgroundColor: colores,
+            borderColor: colores,
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: { y: { beginAtZero: true } }
+        }
+      });
+    }
+
+    function renderizarGraficoServicios(data) {
+      const resumen = {};
+      data.forEach(row => {
+        const servicio = row['Servicio a calificar'] || 'Desconocido';
+        resumen[servicio] = (resumen[servicio] || 0) + 1;
+      });
+      const labels = Object.keys(resumen);
+      const valores = Object.values(resumen);
+      const colores = labels.map((_, i) => `hsl(${(i * 40 + 180) % 360}, 70%, 60%)`);
+      const ctx = document.getElementById('graficoServicios').getContext('2d');
+      if (window.chartServicios) window.chartServicios.destroy();
+      window.chartServicios = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Cantidad por Tipo de Servicio',
+            data: valores,
+            backgroundColor: colores,
+            borderColor: colores,
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: { y: { beginAtZero: true } }
+        }
+      });
+    }
+
+    function renderizarGraficosPreguntas(data) {
+      const preguntas = Object.keys(data[0]).filter(k => k.trim().startsWith('¿'));
+
+      const contenedor = document.getElementById('graficosPreguntas');
+      contenedor.innerHTML = '';
+
+      preguntas.forEach((pregunta, index) => {
+        if (!data.some(row => row[pregunta] && row[pregunta].trim())) {
+          const aviso = document.createElement('div');
+          aviso.className = 'mb-4 alert alert-warning';
+          aviso.textContent = `No hay datos para la pregunta: "${pregunta}"`;
+          contenedor.appendChild(aviso);
+          return;
+        }
+
+        const respuestas = {};
+        data.forEach(row => {
+          const valor = (row[pregunta] || '').trim();
+          if (valor) respuestas[valor] = (respuestas[valor] || 0) + 1;
+        });
+
+        const labels = Object.keys(respuestas);
+        const valores = Object.values(respuestas);
+        const paleta = ['#45B1DF', '#63AEE0', '#2E4C8C', '#A5C6E5', '#CFE5F5'];
+        const colores = labels.map((_, i) => paleta[i % paleta.length]);
+
+        const col = document.createElement('div');
+        col.className = 'col-md-6 col-lg-4 mb-4 d-inline-block align-top px-2';
+
+        const titulo = document.createElement('h6');
+        titulo.className = 'fw-bold';
+        titulo.textContent = pregunta;
+        col.appendChild(titulo);
+
+        const canvas = document.createElement('canvas');
+        canvas.style.maxHeight = '250px';
+        canvas.style.maxWidth = '100%';
+        canvas.id = `graficoPregunta${index}`;
+        col.appendChild(canvas);
+
+        new Chart(canvas, {
+          type: 'pie',
+          data: {
+            labels: labels,
+            datasets: [{
+              data: valores,
+              backgroundColor: colores
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { position: 'bottom' }
+            }
+          }
+        });
+
+        const lista = document.createElement('ul');
+        lista.className = 'mt-2 list-unstyled text-secondary small';
+        labels.forEach((label, i) => {
+          const li = document.createElement('li');
+          li.textContent = `${valores[i]} personas respondieron “${label}”`;
+          lista.appendChild(li);
+        });
+        col.appendChild(lista);
+
+        contenedor.appendChild(col);
+      });
+    }
+  </script>
+<script>
+  function toggleTablaDatos() {
+  const contenedor = document.getElementById('tablaDatosWrapper');
+  const boton = document.querySelector('button[onclick="toggleTablaDatos()"]');
+  const visible = contenedor.style.display !== 'none';
+  contenedor.style.display = visible ? 'none' : 'block';
+  boton.textContent = visible ? 'Mostrar' : 'Ocultar';
+  localStorage.setItem('tablaDatosVisible', !visible);
+}
+
+  function toggleGraficosPreguntas() {
+    const contenedor = document.getElementById('graficosPreguntas');
+    const boton = document.querySelector('button[onclick="toggleGraficosPreguntas()"]');
+    const visible = contenedor.style.display !== 'none';
+    contenedor.style.display = visible ? 'none' : 'block';
+    boton.textContent = visible ? 'Mostrar' : 'Ocultar';
+  }
+</script>
+</body>
+</html>

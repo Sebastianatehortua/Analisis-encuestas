@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Encuesta de Satisfacción - IPS CEAD ALIVIUM</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" rel="stylesheet">
+  <style>
+    body { background-color: #f8f9fa; padding: 2rem; }
+    .form-section { background-color: #ffffff; padding: 2rem; border-radius: 1rem; box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1); margin-bottom: 2rem; }
+    h1, h2 { color: #0d6efd; }
+    .form-section h2 { margin-bottom: 1.5rem; }
+    .form-label { font-weight: 500; }
+    .bi { margin-right: 0.5rem; }
+    .active-check input[type="radio"]:checked + div { border: 2px solid #0d6efd; border-radius: 0.5rem; background-color: #e7f1ff; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="text-center mb-5">
+      <h1 class="display-5"><i class="bi bi-ui-checks-grid"></i>Encuesta de Satisfacción</h1>
+      <p class="lead">IPS CEAD ALIVIUM</p>
+    </div>
+
+    <form class="needs-validation" novalidate>
+      <!-- Información General -->
+      <div class="form-section">
+        <h2><i class="bi bi-calendar3"></i>Información General</h2>
+        <div class="mb-3">
+          <label for="fecha" class="form-label">Fecha</label>
+          <input type="text" class="form-control" id="fecha" required>
+          <div class="invalid-feedback">Por favor seleccione una fecha válida.</div>
+        </div>
+        <div class="mb-3">
+          <label for="servicio" class="form-label">Servicio a calificar</label>
+          <select class="form-select" id="servicio" required>
+            <option value="">Seleccione</option>
+            <option>Atención Consulta Externa</option>
+            <option>Atención Procedimientos</option>
+          </select>
+          <div class="invalid-feedback">Este campo es obligatorio.</div>
+        </div>
+      </div>
+
+      <!-- Datos del Cliente -->
+      <div class="form-section">
+        <h2><i class="bi bi-person-lines-fill"></i>Datos del Cliente</h2>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Nombre completo del usuario</label>
+            <input type="text" class="form-control" required>
+            <div class="invalid-feedback">Este campo es obligatorio.</div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Documento de identidad</label>
+            <input type="text" class="form-control" required>
+            <div class="invalid-feedback">Este campo es obligatorio.</div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Correo electrónico</label>
+            <input type="email" class="form-control" required>
+            <div class="invalid-feedback">Ingrese un correo electrónico válido.</div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Número de contacto / WhatsApp</label>
+            <input type="text" class="form-control" required>
+            <div class="invalid-feedback">Este campo es obligatorio.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Aspectos a Evaluar -->
+      <div class="form-section">
+        <h2><i class="bi bi-bar-chart-steps"></i>Aspectos a Evaluar</h2>
+
+        <!-- Pregunta Trato -->
+        <div class="mb-4">
+          <label class="form-label d-block">¿Cómo califica el trato que le brindó el personal al momento de solicitar su cita?</label>
+          <div class="d-flex justify-content-between text-center gap-2 flex-wrap">
+            <label class="btn btn-outline-primary flex-fill active-check">
+              <input type="radio" name="pregunta_trato" value="no_responde" required hidden>
+              <div>😐<br><small>No responde</small></div>
+            </label>
+            <label class="btn btn-outline-primary flex-fill active-check">
+              <input type="radio" name="pregunta_trato" value="muy_mala" hidden>
+              <div>😡<br><small>Muy mala</small></div>
+            </label>
+            <label class="btn btn-outline-primary flex-fill active-check">
+              <input type="radio" name="pregunta_trato" value="mala" hidden>
+              <div>🙁<br><small>Mala</small></div>
+            </label>
+            <label class="btn btn-outline-primary flex-fill active-check">
+              <input type="radio" name="pregunta_trato" value="regular" hidden>
+              <div>😐<br><small>Regular</small></div>
+            </label>
+            <label class="btn btn-outline-primary flex-fill active-check">
+              <input type="radio" name="pregunta_trato" value="buena" hidden>
+              <div>🙂<br><small>Buena</small></div>
+            </label>
+            <label class="btn btn-outline-primary flex-fill active-check">
+              <input type="radio" name="pregunta_trato" value="muy_buena" hidden>
+              <div>😄<br><small>Muy buena</small></div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Pregunta Información -->
+        <div class="mb-4">
+          <label class="form-label d-block">¿Cómo calificaría la información proporcionada por nuestro personal sobre su cita?</label>
+          <div class="d-flex justify-content-between text-center gap-2 flex-wrap">
+            <label class="btn btn-outline-primary flex-fill active-check">
+              <input type="radio" name="pregunta_info" value="no_responde" required hidden>
+              <div>😐<br><small>No responde</small></div>
+            </label>
+            <label class="btn btn-outline-primary flex-fill active-check">
+              <input type="radio" name="pregunta_info" value="muy_mala" hidden>
+              <div>😡<br><small>Muy mala</small></div>
+            </label>
+            <label class="btn btn-outline-primary flex-fill active-check">
+              <input type="radio" name="pregunta_info" value="mala" hidden>
+              <div>🙁<br><small>Mala</small></div>
+            </label>
+            <label class="btn btn-outline-primary flex-fill active-check">
+              <input type="radio" name="pregunta_info" value="regular" hidden>
+              <div>😐<br><small>Regular</small></div>
+            </label>
+            <label class="btn btn-outline-primary flex-fill active-check">
+              <input type="radio" name="pregunta_info" value="buena" hidden>
+              <div>🙂<br><small>Buena</small></div>
+            </label>
+            <label class="btn btn-outline-primary flex-fill active-check">
+              <input type="radio" name="pregunta_info" value="muy_buena" hidden>
+              <div>😄<br><small>Muy buena</small></div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Pregunta Oportunidad -->
+        <div class="mb-4">
+          <label class="form-label d-block">La oportunidad en la atención después de llegar al consultorio fue:</label>
+          <div class="d-flex justify-content-between text-center gap-2 flex-wrap">
+            <label class="btn btn-outline-primary flex-fill active-check">
+              <input type="radio" name="pregunta_oportunidad" value="no_responde" required hidden>
+              <div>😐<br><small>No responde</small></div>
+            </label>
+            <label class="btn btn-outline-primary flex-fill active-check">
+              <input type="radio" name="pregunta_oportunidad" value="muy_mala" hidden>
+              <div>😡<br><small>Muy mala</small></div>
+            </label>
+            <label class="btn btn-outline-primary flex-fill active-check">
+              <input type="radio" name="pregunta_oportunidad" value="mala" hidden>
+              <div>🙁<br><small>Mala</small></div>
+            </label>
+            <label class="btn btn-outline-primary flex-fill active-check">
+              <input type="radio" name="pregunta_oportunidad" value="regular" hidden>
+              <div>😐<br><small>Regular</small></div>
+            </label>
+            <label class="btn btn-outline-primary flex-fill active-check">
+              <input type="radio" name="pregunta_oportunidad" value="buena" hidden>
+              <div>🙂<br><small>Buena</small></div>
+            </label>
+            <label class="btn btn-outline-primary flex-fill active-check">
+              <input type="radio" name="pregunta_oportunidad" value="muy_buena" hidden>
+              <div>😄<br><small>Muy buena</small></div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Pregunta Médico -->
+        <div class="mb-4">
+          <label class="form-label d-block">¿Cómo calificaría la atención que le brindó el médico durante la consulta?</label>
+          <div class="d-flex justify-content-between text-center gap-2 flex-wrap">
+            <label class="btn btn-outline-primary flex-fill active-check">
+              <input type="radio" name="pregunta_medico" value="no_responde" required hidden>
+              <div>😐<br><small>No responde</small></div>
+            </label>
+            <label class="btn btn-outline-primary flex-fill active-check">
+              <input type="radio" name="pregunta_medico" value="muy_mala" hidden>
+              <div>😡<br><small>Muy mala</small></div>
+            </label>
+            <label class="btn btn-outline-primary flex-fill active-check">
+              <input type="radio" name="pregunta_medico" value="mala" hidden>
+              <div>🙁<br><small>Mala</small></div>
+            </label>
+            <label class="btn btn-outline-primary flex-fill active-check">
+              <input type="radio" name="pregunta_medico" value="regular" hidden>
+              <div>😐<br><small>Regular</small></div>
+            </label>
+            <label class="btn btn-outline-primary flex-fill active-check">
+              <input type="radio" name="pregunta_medico" value="buena" hidden>
+              <div>🙂<br><small>Buena</small></div>
+            </label>
+            <label class="btn btn-outline-primary flex-fill active-check">
+              <input type="radio" name="pregunta_medico" value="muy_buena" hidden>
+              <div>😄<br><small>Muy buena</small></div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Pregunta Experiencia General -->
+        <div class="mb-4">
+          <label class="form-label d-block">¿Cómo califica su experiencia respecto a los servicios de salud que ha recibido en la IPS CEAD ALIVIUM?</label>
+          <div class="d-flex justify-content-between text-center gap-2 flex-wrap">
+            <label class="btn btn-outline-primary flex-fill active-check">
+              <input type="radio" name="pregunta_satisfaccion" value="no_responde" required hidden>
+              <div>😐<br><small>No responde</small></div>
+            </label>
+            <label class="btn btn-outline-primary flex-fill active-check">
+              <input type="radio" name="pregunta_satisfaccion" value="muy_mala" hidden>
+              <div>😡<br><small>Muy mala</small></div>
+            </label>
+            <label class="btn btn-outline-primary flex-fill active-check">
+              <input type="radio" name="pregunta_satisfaccion" value="mala" hidden>
+              <div>🙁<br><small>Mala</small></div>
+            </label>
+            <label class="btn btn-outline-primary flex-fill active-check">
+              <input type="radio" name="pregunta_satisfaccion" value="regular" hidden>
+              <div>😐<br><small>Regular</small></div>
+            </label>
+            <label class="btn btn-outline-primary flex-fill active-check">
+              <input type="radio" name="pregunta_satisfaccion" value="buena" hidden>
+              <div>🙂<br><small>Buena</small></div>
+            </label>
+            <label class="btn btn-outline-primary flex-fill active-check">
+              <input type="radio" name="pregunta_satisfaccion" value="muy_buena" hidden>
+              <div>😄<br><small>Muy buena</small></div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fidelidad -->
+      <div class="form-section">
+        <h2><i class="bi bi-people"></i>Fidelidad</h2>
+        <div class="mb-3">
+          <label class="form-label d-block">¿Recomendaría a sus familiares y amigos la IPS CEAD ALIVIUM?</label>
+          <div class="d-flex justify-content-between text-center gap-2 flex-wrap">
+            <label class="btn btn-outline-primary flex-fill active-check">
+              <input type="radio" name="fidelidad2" value="definitivamente_si" required hidden>
+              <div>👍<br><small>Definitivamente Sí</small></div>
+            </label>
+            <label class="btn btn-outline-primary flex-fill active-check">
+              <input type="radio" name="fidelidad2" value="probablemente_si" hidden>
+              <div>👌<br><small>Probablemente Sí</small></div>
+            </label>
+            <label class="btn btn-outline-primary flex-fill active-check">
+              <input type="radio" name="fidelidad2" value="definitivamente_no" hidden>
+              <div>👎<br><small>Definitivamente No</small></div>
+            </label>
+            <label class="btn btn-outline-primary flex-fill active-check">
+              <input type="radio" name="fidelidad2" value="probablemente_no" hidden>
+              <div>🤔<br><small>Probablemente No</small></div>
+            </label>
+            <label class="btn btn-outline-primary flex-fill active-check">
+              <input type="radio" name="fidelidad2" value="no_responde" hidden>
+              <div>😐<br><small>No responde</small></div>
+            </label>
+          </div>
+          <div class="invalid-feedback d-block">Seleccione una opción.</div>
+        </div>
+      </div>
+
+      <!-- Derechos y Deberes -->
+      <div class="form-section">
+        <h2><i class="bi bi-shield-check"></i>Derechos y Deberes</h2>
+
+        <div class="mb-3">
+          <label class="form-label">¿El personal de la institución le habló de sus derechos y deberes como usuario?</label><br>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="derechos_informado" id="derechos_si" value="Sí" required>
+            <label class="form-check-label" for="derechos_si">Sí</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="derechos_informado" id="derechos_no" value="No">
+            <label class="form-check-label" for="derechos_no">No</label>
+          </div>
+          <div class="invalid-feedback d-block">Seleccione una opción.</div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label d-block">¿Recuerda un derecho?</label>
+          <div class="d-flex justify-content-between text-center gap-2 flex-wrap">
+            <label class="btn btn-outline-info flex-fill active-check">
+              <input type="radio" name="derecho" value="trato_digno" required hidden>
+              <div>🤝<br><small>Trato digno</small></div>
+            </label>
+            <label class="btn btn-outline-info flex-fill active-check">
+              <input type="radio" name="derecho" value="atencion_medica" hidden>
+              <div>🔹<br><small>Atención médica</small></div>
+            </label>
+            <label class="btn btn-outline-info flex-fill active-check">
+              <input type="radio" name="derecho" value="consentimiento" hidden>
+              <div>📝<br><small>Consentimiento</small></div>
+            </label>
+            <label class="btn btn-outline-info flex-fill active-check">
+              <input type="radio" name="derecho" value="cuidado_final" hidden>
+              <div>💉<br><small>Cuidado final</small></div>
+            </label>
+            <label class="btn btn-outline-info flex-fill active-check">
+              <input type="radio" name="derecho" value="privacidad" hidden>
+              <div>🔒<br><small>Privacidad</small></div>
+            </label>
+          </div>
+          <div class="invalid-feedback d-block">Seleccione un derecho.</div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Escriba su respuesta</label>
+          <textarea class="form-control" rows="2" required></textarea>
+          <div class="invalid-feedback">Este campo es obligatorio.</div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label d-block">¿Recuerda un deber?</label>
+          <div class="d-flex justify-content-between text-center gap-2 flex-wrap">
+            <label class="btn btn-outline-warning flex-fill active-check">
+              <input type="radio" name="deber" value="autocuidado" required hidden>
+              <div>🧍<br><small>Autocuidado</small></div>
+            </label>
+            <label class="btn btn-outline-warning flex-fill active-check">
+              <input type="radio" name="deber" value="normas" hidden>
+              <div>🔸<br><small>Normas</small></div>
+            </label>
+            <label class="btn btn-outline-warning flex-fill active-check">
+              <input type="radio" name="deber" value="cuidar_ips" hidden>
+              <div>🏥<br><small>Cuidar IPS</small></div>
+            </label>
+            <label class="btn btn-outline-warning flex-fill active-check">
+              <input type="radio" name="deber" value="participacion" hidden>
+              <div>🤝<br><small>Participación</small></div>
+            </label>
+            <label class="btn btn-outline-warning flex-fill active-check">
+              <input type="radio" name="deber" value="recursos" hidden>
+              <div>💰<br><small>Recursos</small></div>
+            </label>
+          </div>
+          <div class="invalid-feedback d-block">Seleccione un deber.</div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">¿Durante la atención sintió que le vulneraron algún derecho y cuál?</label>
+          <textarea class="form-control" rows="2" required></textarea>
+          <div class="invalid-feedback">Por favor escriba su respuesta.</div>
+        </div>
+      </div>
+
+      <!-- Botón Enviar -->
+      <div class="text-center mb-4">
+        <button type="submit" class="btn btn-primary btn-lg">
+          <i class="bi bi-send-fill"></i>Enviar Encuesta
+        </button>
+      </div>
+      <div class="alert alert-success d-none text-center mt-4" id="mensajeExito" role="alert">
+        ✅ ¡Gracias por completar la encuesta!
+      </div>
+    </form>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+  <script>
+    flatpickr("#fecha", { dateFormat: "Y-m-d", maxDate: "today", locale: "es" });
+    new Choices(document.getElementById('servicio'), { searchEnabled: false, itemSelectText: '', shouldSort: false });
+    (function() {
+      'use strict';
+      const forms = document.querySelectorAll('.needs-validation');
+      Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+          if (!form.checkValidity()) {
+            event.preventDefault(); event.stopPropagation(); document.getElementById('mensajeExito').classList.add('d-none');
+          } else {
+            event.preventDefault(); form.classList.add('was-validated'); document.getElementById('mensajeExito').classList.remove('d-none'); form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+          form.classList.add('was-validated');
+        }, false);
+      });
+    })();
+  </script>
+</body>
+</html>
